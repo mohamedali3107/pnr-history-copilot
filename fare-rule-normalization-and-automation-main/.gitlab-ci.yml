@@ -1,0 +1,114 @@
+image: drinternet/rsync:1.0.1
+
+variables:
+  NGINX_CONTAINER_ID: ""
+  NGINX_IMAGE_NAME: "nginx"
+  NGINX_IMAGE_ID: ""
+  CLIENT_CONTAINER_ID: ""
+  CLIENT_IMAGE_NAME: "client"
+  CLIENT_IMAGE_ID: ""
+  SERVER_CONTAINER_ID: ""
+  SERVER_IMAGE_NAME: "server"
+  SERVER_IMAGE_ID: ""
+  NETWORK_NAME: "airules_final_version_my-network"
+  NETWORK_ID: ""
+
+stages:
+  - lint
+  - deploy
+
+lint_python:
+  stage: lint
+  image: python:3.11
+  script:
+    - cd final_version/server
+    - pip install -r requirements.txt
+    - pip install flake8
+    - flake8 . --extend-ignore=E501
+
+lint_typescript:
+  stage: lint
+  image: node:18.17
+  script:
+    - cd final_version/client
+    - npm install
+    - npm install -g eslint
+    - eslint . --ext .ts,.tsx
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to production server..."
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - cd final_version
+    - ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "echo SSH connection successful"
+    - rsync -e "ssh -i ~/.ssh/id_rsa" -rv * $SSH_USER@$SSH_HOST:airules_final_version
+
+    - ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd airules_final_version &&
+      sudo cp nginx/nginx.conf /etc/nginx/sites-available/fastapi-app &&
+      sudo nginx -t &&
+      sudo systemctl restart nginx"
+    - |
+      export NGINX_CONTAINER_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker ps -a -q --filter 'ancestor=$NGINX_IMAGE_NAME'")
+      if [ -n "$NGINX_CONTAINER_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST  "docker rm -f $NGINX_CONTAINER_ID"
+        echo "Container with ID $NGINX_CONTAINER_ID removed."
+      else
+        echo "No container found for the specified $NGINX_IMAGE_NAME."
+      fi
+    - |
+      export NGINX_IMAGE_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker images -q $NGINX_IMAGE_NAME")
+      if [ -n "$NGINX_IMAGE_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker rmi -f $NGINX_IMAGE_ID"
+        echo "Docker image with ID $NGINX_IMAGE_ID removed."
+      else
+        echo "No Docker image found for the specified $NGINX_IMAGE_NAME."
+      fi
+    - |
+      export CLIENT_CONTAINER_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker ps -a -q --filter 'ancestor=$CLIENT_IMAGE_NAME'")
+      if [ -n "$CLIENT_CONTAINER_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST  "docker rm -f $CLIENT_CONTAINER_ID"
+        echo "Container with ID $CLIENT_CONTAINER_ID removed."
+      else
+        echo "No container found for the specified $CLIENT_IMAGE_NAME."
+      fi
+    - |
+      export CLIENT_IMAGE_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker images -q $CLIENT_IMAGE_NAME")
+      if [ -n "$CLIENT_IMAGE_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker rmi -f $CLIENT_IMAGE_ID"
+        echo "Docker image with ID $CLIENT_IMAGE_ID removed."
+      else
+        echo "No Docker image found for the specified $CLIENT_IMAGE_NAME."
+      fi
+    - |
+      export SERVER_CONTAINER_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker ps -a -q --filter 'ancestor=$SERVER_IMAGE_NAME'")
+      if [ -n "$SERVER_CONTAINER_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST  "docker rm -f $SERVER_CONTAINER_ID"
+        echo "Container with ID $SERVER_CONTAINER_ID removed."
+      else
+        echo "No container found for the specified $SERVER_IMAGE_NAME."
+      fi
+    - |
+      export SERVER_IMAGE_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker images -q $SERVER_IMAGE_NAME")
+      if [ -n "$SERVER_IMAGE_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker rmi -f $SERVER_IMAGE_ID"
+        echo "Docker image with ID $SERVER_IMAGE_ID removed."
+      else
+        echo "No Docker image found for the specified $SERVER_IMAGE_NAME."
+      fi
+    - |
+      export NETWORK_ID=$(ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker network ls -f name=$NETWORK_NAME -q")
+      if [ -n "$NETWORK_ID" ]; then
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "docker network rm $NETWORK_NAME"
+        echo "Docker network $NETWORK_NAME removed."
+      else
+        echo "No Docker network found with the name $NETWORK_NAME."
+      fi
+    - ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST
+      "cd airules_final_version &&
+      docker-compose build &&
+      docker-compose up -d"
+
+  only:
+    - main
