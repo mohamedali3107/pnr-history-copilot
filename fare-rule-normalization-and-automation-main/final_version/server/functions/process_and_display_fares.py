@@ -17,7 +17,7 @@ _ = load_dotenv(find_dotenv())  # read local .env file
 openai.api_key = os.environ["OPENAI_API_KEY"]
 os.environ["OPENAI_API_TYPE"] = "azure"
 os.environ["OPENAI_API_BASE"] = "https://ama-openai-uks.openai.azure.com/"
-os.environ["OPENAI_API_VERSION"] = "2023-07-01-preview"
+os.environ["OPENAI_API_VERSION"] = "2023-05-15"
 
 deployment_name = "gpt-4-0613"
 embedding_model_name = "text-embedding-ada-002"
