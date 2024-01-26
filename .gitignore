@@ -1,2 +1,11 @@
 #Dossier où est la clé GPT-4
 .streamlit/
+
+#python
+*.pyc
+.pytest_cache/
+__pycache__/
+.venv/
+
+#OS
+.DS_Store

@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+from AzureClient import client
 import yaml 
 
 st.set_page_config(page_title="Amadeus Co-Pilot", page_icon=":plane:")
@@ -12,8 +12,6 @@ if pnr_history_file is not None:
     pnr_history = pnr_history_file.read()
     #st.text("Affichage du PNR History :")
     #st.text(contenu)
-
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-4"
