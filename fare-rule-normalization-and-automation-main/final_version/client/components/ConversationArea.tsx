@@ -22,7 +22,7 @@ export function ConversationArea() {
     setIsLoading(true);
     const urls = [
       "http://127.0.0.1:8000/answer_chat",
-      "https://f23-p2-airules.paris-digital-lab.fr/back/answer_chat",
+      "https://f23-p3-amadeus.paris-digital-lab.fr/back/answer_chat",
     ];
 
     let response;

@@ -1,16 +1,37 @@
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormItem, FormField, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormItem,
+  FormField,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useState } from "react";
 import { useChatStore } from "./chatStore";
 import { useLoadingStore } from "./Loading";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 
 export function FlightNumberSubForm() {
@@ -38,10 +59,17 @@ export function FlightNumberSubForm() {
 
   const handleSubmit = async () => {
     if (!flightNumber) {
-      addToHistory({ content: "WARNING : It seems that some fields are missing...", role: "system", id: "2" });
+      addToHistory({
+        content: "WARNING : It seems that some fields are missing...",
+        role: "system",
+        id: "2",
+      });
     } else {
       setIsLoading(true);
-      const urls = ["http://127.0.0.1:8000/fill_template_DB", "https://f23-p2-airules.paris-digital-lab.fr/back/fill_template_DB"];
+      const urls = [
+        "http://127.0.0.1:8000/fill_template_DB",
+        "https://f23-p3-amadeus.paris-digital-lab.fr/back/fill_template_DB",
+      ];
 
       let response;
 
@@ -61,25 +89,57 @@ export function FlightNumberSubForm() {
               setIsLoading(false);
 
               if (data.DB_error) {
-                addToHistory({ content: "WARNING : Could not find the booking reference", role: "system", id: "2" });
+                addToHistory({
+                  content: "WARNING : Could not find the booking reference",
+                  role: "system",
+                  id: "2",
+                });
               } else if (data.have_fare_rule) {
                 data.fares_to_display.forEach((element: any) => {
                   addToHistory({ content: element, role: "system", id: "2" });
                 });
                 if (data.have_webtext === true) {
-                  addToHistory({ content: data.paragraph_webtext.paragraph, role: "system", id: "web2" });
+                  addToHistory({
+                    content: data.paragraph_webtext.paragraph,
+                    role: "system",
+                    id: "web2",
+                  });
 
-                  addToHistory({ content: "You can now ask questions about this flight, a PDF and the company Trade Portal.", role: "system", id: "2" });
+                  addToHistory({
+                    content:
+                      "You can now ask questions about this flight, a PDF and the company Trade Portal.",
+                    role: "system",
+                    id: "2",
+                  });
                 } else {
-                  addToHistory({ content: "You can now ask questions about this flight and a PDF.", role: "system", id: "2" });
+                  addToHistory({
+                    content:
+                      "You can now ask questions about this flight and a PDF.",
+                    role: "system",
+                    id: "2",
+                  });
                 }
               } else {
                 if (data.have_webtext === true) {
-                  addToHistory({ content: data.paragraph_webtext.paragraph, role: "system", id: "web2" });
+                  addToHistory({
+                    content: data.paragraph_webtext.paragraph,
+                    role: "system",
+                    id: "web2",
+                  });
 
-                  addToHistory({ content: "WARNING : No fare rules found for this flight. You can still ask questions about a PDF and the company Trade Portal.", role: "system", id: "2" });
+                  addToHistory({
+                    content:
+                      "WARNING : No fare rules found for this flight. You can still ask questions about a PDF and the company Trade Portal.",
+                    role: "system",
+                    id: "2",
+                  });
                 } else {
-                  addToHistory({ content: "WARNING : No fare rules found for this flight. You can still ask questions about a PDF but the Trade Portal is not available. ", role: "system", id: "2" });
+                  addToHistory({
+                    content:
+                      "WARNING : No fare rules found for this flight. You can still ask questions about a PDF but the Trade Portal is not available. ",
+                    role: "system",
+                    id: "2",
+                  });
                 }
               }
             } catch (error) {
@@ -102,7 +162,9 @@ export function FlightNumberSubForm() {
 
   return (
     <AccordionItem value="item-1">
-      <AccordionTrigger className="text-white">Search via Booking Number</AccordionTrigger>
+      <AccordionTrigger className="text-white">
+        Search via Booking Number
+      </AccordionTrigger>
       <AccordionContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -111,12 +173,26 @@ export function FlightNumberSubForm() {
               name="language"
               render={({ field }) => (
                 <FormItem className="flex flex-col text-placeholder w-full">
-                  <FormLabel className="text-neutral">Booking Reference</FormLabel>
+                  <FormLabel className="text-neutral">
+                    Booking Reference
+                  </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
-                        <Button variant="outline" role="combobox" className={cn("w-full justify-between text-primary", !field.value && "text-muted-foreground")}>
-                          {field.value ? flightNumbers.find((flightNumber) => flightNumber.value === field.value)?.label : "Select booking reference"}
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between text-primary",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? flightNumbers.find(
+                                (flightNumber) =>
+                                  flightNumber.value === field.value
+                              )?.label
+                            : "Select booking reference"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -125,7 +201,10 @@ export function FlightNumberSubForm() {
                     <PopoverContent className="w-full p-0">
                       <PopoverClose>
                         <Command className="w-full">
-                          <CommandInput placeholder="Booking reference" className="text-primary w-full" />
+                          <CommandInput
+                            placeholder="Booking reference"
+                            className="text-primary w-full"
+                          />
                           <CommandEmpty>No booking found</CommandEmpty>
                           <CommandGroup>
                             {flightNumbers.map((flightNumber) => (
@@ -137,7 +216,14 @@ export function FlightNumberSubForm() {
                                   setFlightNumber(flightNumber.value);
                                 }}
                               >
-                                <Check className={cn("mr-2 h-4 w-4", flightNumber.value === field.value ? "opacity-100" : "opacity-0")} />
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    flightNumber.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
                                 {flightNumber.label}
                               </CommandItem>
                             ))}
@@ -152,7 +238,10 @@ export function FlightNumberSubForm() {
               )}
             />
 
-            <Button type="submit" className="bg-secondary text-neutral rounded-md p-2 mt-5 hover:bg-hover hover:text-white transition duration-300 ease-in-out w-full ">
+            <Button
+              type="submit"
+              className="bg-secondary text-neutral rounded-md p-2 mt-5 hover:bg-hover hover:text-white transition duration-300 ease-in-out w-full "
+            >
               {" "}
               Submit
             </Button>
