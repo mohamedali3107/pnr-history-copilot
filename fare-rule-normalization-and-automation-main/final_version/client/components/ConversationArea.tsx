@@ -20,7 +20,10 @@ export function ConversationArea() {
     addToHistory({ content: question, role: "user", id: "1" });
     setQuestion("");
     setIsLoading(true);
-    const urls = ["http://127.0.0.1:8000/answer_chat", "https://f23-p2-airules.paris-digital-lab.fr/back/answer_chat"];
+    const urls = [
+      "http://127.0.0.1:8000/answer_chat",
+      "https://f23-p2-airules.paris-digital-lab.fr/back/answer_chat",
+    ];
 
     let response;
 
@@ -33,10 +36,11 @@ export function ConversationArea() {
           },
           body: JSON.stringify({ question: question }),
         });
-
+        console.log("response :", response);
         if (response.ok) {
           try {
             const data = await response.json();
+            console.log("data : ", data);
             setIsLoading(false);
 
             addToHistory({ content: data.answer, role: "system", id: "2" });
@@ -53,31 +57,68 @@ export function ConversationArea() {
   };
 
   return (
-    <div id="chat" className="w-3/4 flex flex-col justify-center items-center relative bg-tertiary">
+    <div
+      id="chat"
+      className="w-3/4 flex flex-col justify-center items-center relative bg-tertiary"
+    >
       {/* Logo */}
       <div className="absolute top-2 w-1/6 mt-8">
         <Image src={logo} alt="Logo" className="" />
-        <h1 className="font-bold text-xl text-slate-500 font-body" style={{ textAlign: "center" }}>
-          AI Rules
+        <h1
+          className="font-bold text-xl text-slate-500 font-body"
+          style={{ textAlign: "center" }}
+        >
+          copilot
         </h1>
       </div>
 
       {/* Blob animation : if chat history is empty, then if isLoading : display BlobAnimation, BlobStatic else */}
-      {chatHistory.length === 0 ? isLoading ? <BlobStatic /> : <BlobAnimation /> : <></>}
+      {chatHistory.length === 0 ? (
+        isLoading ? (
+          <BlobStatic />
+        ) : (
+          <BlobAnimation />
+        )
+      ) : (
+        <></>
+      )}
 
       {/* Chat feed section */}
 
       {ChatFeed()}
 
       {/* Prompting bar section */}
-      <form onSubmit={handleSubmit} className="p-5 bg-primary rounded-xl bottom-4 fixed w-1/2  ">
+      <form
+        onSubmit={handleSubmit}
+        className="p-5 bg-primary rounded-xl bottom-4 fixed w-1/2  "
+      >
         <div className="flex relative items-center ">
-          <input className="w-full focus:outline-none placeholder:text-primary text-sm text-primary p-3 pr-16 rounded-lg" type="text" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Send message.." />
+          <input
+            className="w-full focus:outline-none placeholder:text-primary text-sm text-primary p-3 pr-16 rounded-lg"
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Send message.."
+          />
 
           {!isLoading ? (
-            <button type="submit" className="absolute bg-secondary p-1 rounded-lg right-0 mr-3">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            <button
+              type="submit"
+              className="absolute bg-secondary p-1 rounded-lg right-0 mr-3"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                />
               </svg>
             </button>
           ) : (

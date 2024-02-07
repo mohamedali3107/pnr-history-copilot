@@ -6,7 +6,6 @@ export default function Home() {
   return (
     <div className="h-screen flex">
       {Sidebar()}
-
       {ConversationArea()}
     </div>
   );

@@ -80,7 +80,28 @@ def pdf_to_vector_store(pdf):
     Returns:
     - VectoreStore (vectorestore): The vectore store corresponding to the pdf file.
     """
-    text = extract_text_from_pdf(pdf)
+    if pdf == None: 
+        text = "No content"
+    else: 
+        text = extract_text_from_pdf(pdf)
+    print("TEEEEXT")
     chunks = split_text(text)
+    print("CHUUUUNKS", chunks)
+    vector_store = embed_chunks(chunks)
+    print("CECIIIIII EST UN VECTORSTORRRRE: ", vector_store)
+    return vector_store
+
+def pnr_to_vector_store(pnr):
+    """
+    Use split_text() and embed_chunks() methods to return the corresponding vectore store of a pdf.
+
+    Parameters:
+    - pnr history: The PNR in txt format you want to vectorize
+
+    Returns:
+    - VectoreStore (vectorestore): The vectore store corresponding to the pnr history.
+    """
+    chunks = split_text(pnr)
     vector_store = embed_chunks(chunks)
     return vector_store
+    
