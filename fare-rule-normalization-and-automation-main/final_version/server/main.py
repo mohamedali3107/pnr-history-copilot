@@ -4,16 +4,18 @@ from fastapi.middleware.cors import (
 )
 from fastapi import Body
 from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 
 # Custom imports
 import functions.get_fare_rules_from_API as gfAPI
 from functions.get_fare_rules_from_DB import get_fare_rules_from_DB
 from functions.process_and_display_fares import process_and_display_flight_fares
 from functions.answer_chat import answer
-from functions.create_qa_chain import create_qa_chain, chain_paragraph
-from functions.generate_prompt import get_prompt
+from functions.create_qa_chain import create_qa_chain, chain_paragraph, create_qa_chain_no_context, chain_paragraph_pnr
+from functions.generate_prompt import get_prompt, pnr_prompt
 from functions.generate_prompt import prompt_paragraph_web, question_paragraph_web
 from functions.generate_prompt import prompt_paragraph_PDF, question_paragraph_PDF
+from functions.generate_prompt import prompt_summary_pnr, question_paragraph_pnr
 import utils.utils as u
 
 
@@ -41,8 +43,10 @@ app.add_middleware(
 global qa_chain_ATPCO
 global qa_chain_PDF
 global qa_chain_WEB
+global qa_chain_PNR
 global chat_history
 global webtext
+qa_chain_PNR = None
 qa_chain_ATPCO = None
 qa_chain_PDF = None
 qa_chain_WEB = None
@@ -52,7 +56,8 @@ chat_history = ConversationBufferMemory(memory_key="chat_history", output_key="a
 # Get bot response
 @app.post("/answer_chat")
 async def get_answer(question: str = Body(..., embed=True)):
-    response = answer(question, qa_chain_ATPCO)
+    response = answer(question, qa_chain_PNR)
+    #response = answer(question, qa_chain_ATPCO)
 
     if response == "Unknown":
         response = answer(question, qa_chain_PDF)
@@ -61,15 +66,11 @@ async def get_answer(question: str = Body(..., embed=True)):
         response = answer(question, qa_chain_WEB)
 
     if response == "Unknown":
-        response = "Sorry but I couldn't find an answer to your question. It might be not available or please try to reformulate it."
+        response = "Please upload a PNR History first."
 
     print({"answer": response})
 
     return {"answer": response}
-
-
-def paragraph_web():
-    return
 
 
 # This function takes as input the departure date, the origin code, the destination code and the airline code
@@ -179,6 +180,7 @@ async def upload_pdf(pdf: UploadFile):
     vector_store_PDF = u.pdf_to_vector_store(pdf)
     prompt = get_prompt(source="PDF")
     global qa_chain_PDF
+    print("prompt : ", prompt)
     qa_chain_PDF = create_qa_chain(vector_store_PDF, chat_history, prompt)
     chain_paragraph_PDF = chain_paragraph(
         vector_store_PDF, prompt_paragraph_PDF, nb_chunks=12, search_type="similarity"
@@ -188,3 +190,28 @@ async def upload_pdf(pdf: UploadFile):
     # paragraph = answer(prompt_paragraph, qa_chain_PDF)
     paragraph = chain_paragraph_PDF({"query": question_paragraph_PDF})["result"]
     return {"paragraph": f"Some key points retrieved from the PDF :\n{paragraph}"}
+
+@app.post("/upload_pnr")
+async def upload_pnr(pnr: UploadFile):
+    pnr= await pnr.read()
+    pnr_str= pnr.decode("utf-8")
+    prompt = pnr_prompt(pnr_str) 
+    vector_store_null = u.pdf_to_vector_store(None)
+    global qa_chain_PNR
+    #chat_history = ConversationBufferMemory(memory_key="chat_history", output_key="answer")
+    # qa_chain_PNR= create_qa_chain_no_context(chat_history, prompt)
+    # prompt_paragraph_pnr = prompt_summary_pnr(pnr)
+    # chain_pnr = chain_paragraph_pnr(prompt_paragraph_pnr)
+    # paragraph = chain_pnr({"query": question_paragraph_PDF})["result"]
+    # return {"paragraph": f"Summary of PNR history :\n{paragraph}"}
+    prompt_paragraph_pnr = prompt_summary_pnr(pnr_str)
+    print("Prompt créé")
+    print("prompt :", prompt)
+    qa_chain_PNR = create_qa_chain(vector_store_null, chat_history, prompt)
+    print("Chaine créée")
+    chain_paragraph_pnr = chain_paragraph(
+        vector_store_null, prompt_paragraph_pnr, nb_chunks=12, search_type="similarity"
+    )
+    paragraph = chain_paragraph_pnr({"query": question_paragraph_pnr})["result"]
+    return {"paragraph": paragraph}
+    #Autre solution: Changer juste le prompt de tous les trucs pour les adapter au pnr

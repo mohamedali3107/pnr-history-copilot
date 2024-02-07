@@ -17,11 +17,15 @@ export function ChatFeed() {
   ) : (
     <div className="flex flex-row  w-[60%] gap-4 justify-center absolute bottom-28">
       <div className="border-2 border-primary rounded-md w-[50%]">
-        <p className="text-primary text-center text-sm p-5">Start searching for a flight fare in the chat section</p>
+        <p className="text-primary text-center text-sm p-5">
+          Upload your PNR history to get a summarize version{" "}
+        </p>
       </div>
 
       <div className="border-2 border-primary rounded-md w-[50%]">
-        <p className="text-primary text-center text-sm p-5">Or just drop a PDF in the chat section and ask questions about it</p>
+        <p className="text-primary text-center text-sm p-5">
+          Ask questions to the ChatBot for more informations{" "}
+        </p>
       </div>
     </div>
   );
