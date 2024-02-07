@@ -51,7 +51,7 @@ export function FlightInfoSubForm() {
       setIsLoading(true);
       const urls = [
         "http://127.0.0.1:8000/fill_template_API",
-        "https://f23-p2-airules.paris-digital-lab.fr/back/fill_template_API",
+        "https://f23-p3-amadeus.paris-digital-lab.fr/back/fill_template_API",
       ];
 
       let response;

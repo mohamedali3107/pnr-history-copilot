@@ -67,7 +67,7 @@ export function PnrUpload() {
 
     const urls = [
       "http://127.0.0.1:8000/upload_pnr",
-      "https://f23-p2-airules.paris-digital-lab.fr/back/upload_pnr",
+      "https://f23-p3-amadeus.paris-digital-lab.fr/back/upload_pnr",
     ];
 
     let response;
