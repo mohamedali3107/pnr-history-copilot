@@ -49,13 +49,28 @@ type PassengerData = {
   "general remarks": string[];
 };
 
+type UpdateType = {
+  "modification date": string;
+  object: string;
+  author: string;
+};
+
+type AnswerType = {
+  summary: PassengerData;
+  updates: UpdateType[];
+};
+
 export function PnrUpload() {
   const { addToHistory } = useChatStore();
   const { setIsLoading } = useLoadingStore();
   const [pnrSummary, setPnrSummary] = useState<string | null>(null);
-  let pnrData: PassengerData | null = null;
+  let pnrData: AnswerType | null = null;
+  let pnrSum: PassengerData | null = null;
   if (pnrSummary !== null) {
     pnrData = JSON.parse(pnrSummary);
+    if (pnrData !== null) {
+      pnrSum = pnrData["summary"];
+    }
   }
   const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
   const pnrInputRef = useRef<HTMLInputElement>(null);
@@ -173,7 +188,8 @@ export function PnrUpload() {
           <p className="text-secondary font-semibold">Passengers :</p>
           <ul>
             {pnrData &&
-              pnrData["passengers name"].map((passenger, index) => (
+              pnrSum &&
+              pnrSum["passengers name"].map((passenger, index) => (
                 <li key={index} className="text-white text-sm ml-4">
                   • {passenger}
                 </li>
@@ -181,7 +197,7 @@ export function PnrUpload() {
           </ul>
           <AccordionItem value="item-1">
             <p className="text-secondary font-semibold mt-2">Flights :</p>
-            {pnrData?.flights.map((flight, index) => (
+            {pnrSum?.flights.map((flight, index) => (
               <AccordionItem key={index} value={`flight-${index}`}>
                 <AccordionTrigger className="text-sm text-white">{`${flight.depart} to ${flight.arrival}`}</AccordionTrigger>
                 <AccordionContent>
@@ -217,7 +233,8 @@ export function PnrUpload() {
           <p className="text-secondary font-semibold mt-2">General remarks :</p>
           <ul>
             {pnrData &&
-              pnrData["general remarks"].map((remark, index) => (
+              pnrSum &&
+              pnrSum["general remarks"].map((remark, index) => (
                 <li key={index} className="text-white text-sm indent-4">
                   • {remark}
                 </li>

@@ -9,11 +9,40 @@ import { ChatFeed } from "./ChatFeed";
 import { useLoadingStore } from "./Loading";
 import { LoadingAnimation } from "./LoadingAnimation";
 import { BlobStatic } from "@/components/BlobStatic";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export function ConversationArea() {
   const [question, setQuestion] = useState<string>("");
   const { chatHistory, addToHistory } = useChatStore();
   const { isLoading, setIsLoading } = useLoadingStore();
+  const steps = [
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+  ];
 
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -59,17 +88,31 @@ export function ConversationArea() {
   return (
     <div
       id="chat"
-      className="w-3/4 flex flex-col justify-center items-center relative bg-tertiary"
+      className="w-3/4 flex flex-col justify-center relative items-center bg-tertiary"
     >
       {/* Logo */}
-      <div className="absolute top-2 w-1/6 mt-8">
-        <Image src={logo} alt="Logo" className="" />
+      <div className="absolute top-2 mt-8 flex flex-col items-center">
+        <Image src={logo} alt="Logo" className="w-1/6" />
         <h1
-          className="font-bold text-xl text-slate-500 font-body"
+          className="font-bold text-xl text-slate-500 font-body mb-3"
           style={{ textAlign: "center" }}
         >
           copilot
         </h1>
+        <div className="w-full px-10 flex justify-center absolute top-24">
+          <ScrollArea className="whitespace-nowrap">
+            <Box sx={{ width: "100%" }}>
+              <Stepper activeStep={steps.length} alternativeLabel>
+                {steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
 
       {/* Blob animation : if chat history is empty, then if isLoading : display BlobAnimation, BlobStatic else */}
