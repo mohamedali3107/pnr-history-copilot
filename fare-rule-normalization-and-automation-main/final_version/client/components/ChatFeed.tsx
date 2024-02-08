@@ -7,7 +7,7 @@ export function ChatFeed() {
   const { chatHistory, addToHistory } = useChatStore();
 
   return chatHistory.length !== 0 ? (
-    <div className="h-[560px] space-y-5 w-[75%] overflow-y-auto flex flex-col justify-end">
+    <div className="h-3/5 mt-20 space-y-5 w-[75%] overflow-y-auto flex flex-col justify-end">
       <ScrollArea id="chat-feed">
         {chatHistory.map((message) => (
           <div key={message.id}>{ChatMessage({ message: message })}</div>

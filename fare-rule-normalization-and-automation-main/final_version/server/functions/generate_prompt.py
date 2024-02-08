@@ -294,31 +294,65 @@ def prompt_summary_pnr(pnr):
     return prompt_paragraph_pnr
 
 question_paragraph_pnr = """
-    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Your answer must follow exactly this json format: 
-    {
-        "passengers name": [LIST OF PASSENGERS],
-        "flights": [
+    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Please put as many flights and updates as there are in the PNR History. Your answer must follow exactly this json format: 
+    {   "summary": {
+            "passengers name": [LIST OF PASSENGERS],
+            "flights": [
+                {
+                    "depart": 
+                    "arrival":
+                    "date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                    "flight number":
+                    "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
+                    "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
+                },
+                {
+                    "depart": 
+                    "arrival":
+                    "date":
+                    "flight number":
+                    "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
+                    "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
+                }
+            ],
+            "ticket numnber": [LIST OF TICKET NUMBER],
+            "general remarks": [LIST OF REMARKS RANKED BY RELEVANCE FOR A TRAVEL AGENT]
+        }, 
+        "updates": [
             {
-                "depart": 
-                "arrival":
-                "date": DATE WRITTEN IN THE FORMAT MM/DD/YY
-                "flight number":
-                "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
-                "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
+                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
+                "author": AUTHOR OF THE UPDATE 
             },
             {
-                "depart": 
-                "arrival":
-                "date":
-                "flight number":
-                "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
-                "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
+                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
+                "author": AUTHOR OF THE UPDATE 
             }
-        ],
-        "ticket numnber": [LIST OF TICKET NUMBER],
-        "general remarks": [LIST OF REMARKS RANKED BY RELEVANCE FOR A TRAVEL AGENT]
+        ]
+        
     }
     
+    Please do not add anything else outside the { } of the JSON !
+    """
+    
+question_updates_pnr = """Please fill the following template. Order the list "updates" by dates from the most recent to the oldest. Your answer must exactly follow this format.
+
+    {
+        "updates": [
+            {
+                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
+                "author": AUTHOR OF THE UPDATE 
+            },
+            {
+                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
+                "author": AUTHOR OF THE UPDATE 
+            }
+        ]
+    }
+
     Do not add anything else outside the { } of the JSON
     """
 # Build prompt for the chain used to display key points paragraph from website

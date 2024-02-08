@@ -15,7 +15,7 @@ from functions.create_qa_chain import create_qa_chain, chain_paragraph, create_q
 from functions.generate_prompt import get_prompt, pnr_prompt
 from functions.generate_prompt import prompt_paragraph_web, question_paragraph_web
 from functions.generate_prompt import prompt_paragraph_PDF, question_paragraph_PDF
-from functions.generate_prompt import prompt_summary_pnr, question_paragraph_pnr
+from functions.generate_prompt import prompt_summary_pnr, question_paragraph_pnr, question_updates_pnr
 import utils.utils as u
 
 
@@ -71,7 +71,6 @@ async def get_answer(question: str = Body(..., embed=True)):
     print({"answer": response})
 
     return {"answer": response}
-
 
 # This function takes as input the departure date, the origin code, the destination code and the airline code
 @app.post("/fill_template_API")
@@ -213,6 +212,11 @@ async def upload_pnr(pnr: UploadFile):
     chain_paragraph_pnr = chain_paragraph(
         vector_store_null, prompt_paragraph_pnr, nb_chunks=12, search_type="similarity"
     )
+    # chain_update_pnr = chain_paragraph(
+    #     vector_store_null, prompt_paragraph_pnr, nb_chunks=12, search_type="similarity"
+    # )
     paragraph = chain_paragraph_pnr({"query": question_paragraph_pnr})["result"]
+    # updates = chain_update_pnr({"query": question_updates_pnr})["result"]
     return {"paragraph": paragraph}
     #Autre solution: Changer juste le prompt de tous les trucs pour les adapter au pnr
+    

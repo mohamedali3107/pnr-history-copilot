@@ -7,8 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { MessagesSquare } from "lucide-react";
 import { MessageSquarePlus } from "lucide-react";
+type UpdateType = {
+  "modification date": string;
+  object: string;
+  author: string;
+};
 
-export function Sidebar() {
+export function Sidebar({
+  setPnrInfo,
+  pnrInfo,
+}: {
+  setPnrInfo: React.Dispatch<React.SetStateAction<string | null>>;
+  pnrInfo: string | null;
+}) {
   const previousConversation = [
     "Adding Special Seat...",
     "Flight refund for ...",
@@ -75,7 +86,7 @@ export function Sidebar() {
         {selected === "prev-chat" ? (
           <PrevChatList previousConversation={previousConversation} />
         ) : (
-          <FlightInfoForm />
+          <FlightInfoForm setPnrInfo={setPnrInfo} pnrInfo={pnrInfo} />
         )}
       </div>
     </div>

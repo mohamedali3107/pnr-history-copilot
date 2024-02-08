@@ -9,11 +9,119 @@ import { ChatFeed } from "./ChatFeed";
 import { useLoadingStore } from "./Loading";
 import { LoadingAnimation } from "./LoadingAnimation";
 import { BlobStatic } from "@/components/BlobStatic";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-export function ConversationArea() {
+type Flight = {
+  depart: string;
+  arrival: string;
+  date: string;
+  "flight number": string;
+  "Special Service Requests": string[];
+  "remarks about the fly": string[];
+};
+
+type PassengerData = {
+  "passengers name": string[];
+  flights: Flight[];
+  "ticket numnber": string[];
+  "general remarks": string[];
+};
+
+type UpdateType = {
+  "modification date": string;
+  object: string;
+  author: string;
+};
+
+type AnswerType = {
+  summary: PassengerData;
+  updates: UpdateType[];
+};
+
+export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
   const [question, setQuestion] = useState<string>("");
   const { chatHistory, addToHistory } = useChatStore();
   const { isLoading, setIsLoading } = useLoadingStore();
+  let pnrData: AnswerType | null = null;
+  let pnrTimeline: UpdateType[] | null = null;
+  const sampleTimeline = [
+    {
+      "modification date": "12/13/23",
+      object: "Option for ticketing added with deadline",
+      author: "1A/AMACS",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Cancellation option added due to no ticket",
+      author: "1APUB/ATL",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Vegetarian meal requested for both passengers",
+      author: "AA-1A/AMACS",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Option for ticketing added with deadline",
+      author: "1A/AMACS",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Cancellation option added due to no ticket",
+      author: "1APUB/ATL",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Vegetarian meal requested for both passengers",
+      author: "AA-1A/AMACS",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Option for ticketing added with deadline",
+      author: "1A/AMACS",
+    },
+    {
+      "modification date": "12/13/23",
+      object: "Cancellation option added due to no ticket",
+      author: "1APUB/ATL",
+    },
+  ];
+  const steps = [
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+    "Date and content",
+  ];
+  if (pnrInfo !== null) {
+    pnrData = JSON.parse(pnrInfo);
+    if (pnrData !== null) {
+      pnrTimeline = pnrData["updates"];
+      console.log("pnrSum : ", pnrTimeline);
+      console.log("timeline : ", pnrData["updates"]);
+    }
+  }
 
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -56,20 +164,48 @@ export function ConversationArea() {
     }
   };
 
+  const handleTimelineClick = (index: number) => {
+    // const up: string = `Date  : ${sampleTimeline[index]["modification date"]} \nModification : ${sampleTimeline[index].object}, \nAuthor : ${sampleTimeline[index].author}`;
+    // addToHistory({ content: up, role: "system", id: "2" });
+    if (pnrTimeline !== null) {
+      const updateSummary: string = `Date  : ${pnrTimeline[index]["modification date"]} \nModification : ${pnrTimeline[index].object}, \nAuthor : ${pnrTimeline[index].author}`;
+      addToHistory({ content: updateSummary, role: "system", id: "2" });
+    }
+  };
+
   return (
     <div
       id="chat"
-      className="w-3/4 flex flex-col justify-center items-center relative bg-tertiary"
+      className="w-3/4 flex flex-col justify-center relative items-center bg-tertiary"
     >
       {/* Logo */}
-      <div className="absolute top-2 w-1/6 mt-8">
-        <Image src={logo} alt="Logo" className="" />
+      <div className="absolute top-2 mt-8 flex flex-col items-center">
+        <Image src={logo} alt="Logo" className="w-1/6" />
         <h1
-          className="font-bold text-xl text-slate-500 font-body"
+          className="font-bold text-xl text-slate-500 font-body mb-3"
           style={{ textAlign: "center" }}
         >
           copilot
         </h1>
+        <div className="w-full px-10 flex justify-center absolute top-24 ">
+          <ScrollArea className="whitespace-nowrap">
+            <Box sx={{ width: "100%" }} className="py-2">
+              <Stepper activeStep={steps.length} alternativeLabel>
+                {pnrTimeline?.map((modification, index) => (
+                  <Step key={index}>
+                    <StepLabel
+                      onClick={() => handleTimelineClick(index)}
+                      className="transition-transform transform hover:scale-110 focus:outline-none active:shadow"
+                    >
+                      {modification["modification date"]}
+                    </StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
 
       {/* Blob animation : if chat history is empty, then if isLoading : display BlobAnimation, BlobStatic else */}
@@ -90,9 +226,9 @@ export function ConversationArea() {
       {/* Prompting bar section */}
       <form
         onSubmit={handleSubmit}
-        className="p-5 bg-primary rounded-xl bottom-4 fixed w-1/2  "
+        className="p-5 bg-primary rounded-xl bottom-4 fixed w-1/2"
       >
-        <div className="flex relative items-center ">
+        <div className="flex relative items-center">
           <input
             className="w-full focus:outline-none placeholder:text-primary text-sm text-primary p-3 pr-16 rounded-lg"
             type="text"
