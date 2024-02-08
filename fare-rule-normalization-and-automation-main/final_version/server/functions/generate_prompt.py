@@ -294,7 +294,7 @@ def prompt_summary_pnr(pnr):
     return prompt_paragraph_pnr
 
 question_paragraph_pnr = """
-    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Your answer must follow exactly this json format: 
+    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Please put as many flights and updates as there are in the PNR History. Your answer must follow exactly this json format: 
     {   "summary": {
             "passengers name": [LIST OF PASSENGERS],
             "flights": [

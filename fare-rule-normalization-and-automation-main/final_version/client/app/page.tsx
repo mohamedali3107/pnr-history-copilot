@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <div className="h-screen flex">
       <Sidebar setPnrInfo={setPnrInfo} pnrInfo={pnrInfo} />
-      <ConversationArea />
+      <ConversationArea pnrInfo={pnrInfo} />
     </div>
   );
 }
