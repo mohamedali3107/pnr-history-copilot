@@ -207,6 +207,7 @@ async def upload_pnr(pnr: UploadFile):
     prompt_paragraph_pnr = prompt_summary_pnr(pnr_str)
     print("Prompt créé")
     print("prompt :", prompt)
+    chat_history.clear()
     qa_chain_PNR = create_qa_chain(vector_store_null, chat_history, prompt)
     print("Chaine créée")
     chain_paragraph_pnr = chain_paragraph(
