@@ -48,8 +48,14 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
   const { isLoading, setIsLoading } = useLoadingStore();
   let pnrData: AnswerType | null = null;
   let pnrTimeline: UpdateType[] | null = null;
+
   if (pnrInfo !== null) {
-    pnrData = JSON.parse(pnrInfo);
+    let pnrProcess: string = pnrInfo;
+    if (pnrInfo[0] === "`") {
+      pnrProcess = pnrInfo.substring(7, pnrInfo.length - 3);
+    }
+    console.log("pnrProcess= ", pnrProcess);
+    pnrData = JSON.parse(pnrProcess);
     if (pnrData !== null) {
       pnrTimeline = pnrData["updates"];
       console.log("pnrSum : ", pnrTimeline);

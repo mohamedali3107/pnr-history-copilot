@@ -4,7 +4,9 @@ def pnr_prompt(pnr):
     prompt_paragraph_pnr_str = """
         INSTRUCTIONS: I want you to be an assistant for travel agents and help them with PNRs. Your answer must be concise and written in natural language only and not include quotes from the PNR. I don't want you to tell what element in the PNR history you used. 
         This is how you read the PNR: 
-
+        
+        Each line with numbers (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or a bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol in the end. For instance, in the line RF-NMC-US/WSGTMFLS, WSGTMFLS is the identifier of the person. 
+        Here are additionnal codes: 
         Code used for creating a PNR (Passenger Name Record):
         EO	Origin ETR
         FO	Financial element origin
@@ -173,6 +175,7 @@ def prompt_summary_pnr(pnr):
         INSTRUCTIONS: I want you to be an assistant for travel agents and help them with PNRs. Your answer must be concise and written in natural language only and not include quotes from the PNR. I don't want you to tell what element in the PNR history you used. 
         This is how you read the PNR: 
 
+        This 
         Code used for creating a PNR (Passenger Name Record):
         EO	Origin ETR
         FO	Financial element origin
@@ -294,7 +297,8 @@ def prompt_summary_pnr(pnr):
     return prompt_paragraph_pnr
 
 question_paragraph_pnr = """
-    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Please put as many flights and updates as there are in the PNR History. Your answer must follow exactly this json format: 
+    Clearly provide me with a concise summary of the PNR. For the cities, please provide me the whole name and not an abbrevation. Please put as many flights and updates as there are in the PNR History.
+    Your answer must follow exactly this json format: 
     {   "summary": {
             "passengers name": [LIST OF PASSENGERS],
             "flights": [
@@ -320,12 +324,12 @@ question_paragraph_pnr = """
         }, 
         "updates": [
             {
-                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
                 "author": AUTHOR OF THE UPDATE 
             },
             {
-                "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
                 "author": AUTHOR OF THE UPDATE 
             }
