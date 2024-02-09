@@ -34,7 +34,10 @@ export function ConversationArea() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ question: question }),
+          body: JSON.stringify({
+            question: question,
+            session_id: sessionStorage.getItem("sessionId"),
+          }),
         });
         console.log("response :", response);
         if (response.ok) {

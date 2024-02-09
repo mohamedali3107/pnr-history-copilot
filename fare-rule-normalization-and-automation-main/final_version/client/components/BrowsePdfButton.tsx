@@ -21,6 +21,13 @@ export function BrowsePdfButton() {
     setIsLoading(true);
     const formData = new FormData();
     formData.append("pdf", pdf);
+    const sessionId = sessionStorage.getItem("sessionId");
+    if (sessionId) {
+      formData.append("sessionId", sessionId);
+    } else {
+      console.error("SessionId not found in sessionStorage.");
+      return;
+    }
 
     const urls = [
       "http://127.0.0.1:8000/upload_pdf",

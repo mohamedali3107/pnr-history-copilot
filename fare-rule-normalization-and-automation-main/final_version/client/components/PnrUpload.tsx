@@ -84,6 +84,7 @@ export function PnrUpload() {
             const data = await response.json();
             console.log("data2 : ", data.paragraph);
             setPnrSummary(data.paragraph);
+            sessionStorage.setItem("sessionId", data.session_id);
             // addToHistory({
             //   content: data.paragraph,
             //   role: "assistant",
