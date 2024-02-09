@@ -48,72 +48,6 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
   const { isLoading, setIsLoading } = useLoadingStore();
   let pnrData: AnswerType | null = null;
   let pnrTimeline: UpdateType[] | null = null;
-  const sampleTimeline = [
-    {
-      "modification date": "12/13/23",
-      object: "Option for ticketing added with deadline",
-      author: "1A/AMACS",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Cancellation option added due to no ticket",
-      author: "1APUB/ATL",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Vegetarian meal requested for both passengers",
-      author: "AA-1A/AMACS",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Option for ticketing added with deadline",
-      author: "1A/AMACS",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Cancellation option added due to no ticket",
-      author: "1APUB/ATL",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Vegetarian meal requested for both passengers",
-      author: "AA-1A/AMACS",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Option for ticketing added with deadline",
-      author: "1A/AMACS",
-    },
-    {
-      "modification date": "12/13/23",
-      object: "Cancellation option added due to no ticket",
-      author: "1APUB/ATL",
-    },
-  ];
-  const steps = [
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-    "Date and content",
-  ];
   if (pnrInfo !== null) {
     pnrData = JSON.parse(pnrInfo);
     if (pnrData !== null) {
@@ -190,7 +124,7 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
         <div className="w-full px-10 flex justify-center absolute top-24 ">
           <ScrollArea className="whitespace-nowrap">
             <Box sx={{ width: "100%" }} className="py-2">
-              <Stepper activeStep={steps.length} alternativeLabel>
+              <Stepper activeStep={pnrTimeline?.length} alternativeLabel>
                 {pnrTimeline?.map((modification, index) => (
                   <Step key={index}>
                     <StepLabel
