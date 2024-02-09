@@ -81,7 +81,7 @@ export function PnrUpload({
         if (response.ok) {
           try {
             const data = await response.json();
-            console.log("data2 : ", data.paragraph);
+            console.log("pnrInfo : ", data.paragraph);
             setPnrInfo(data.paragraph);
             // setPnrSummary(data.paragraph);
             setIsLoading(false);
@@ -99,7 +99,13 @@ export function PnrUpload({
 
   //Code qui définit le summary et la timeline
   if (pnrInfo !== null) {
-    pnrData = JSON.parse(pnrInfo);
+    let pnrProcess: string = pnrInfo;
+    if (pnrInfo[0] === "`") {
+      console.log("Chat GPT fait de la D");
+      pnrProcess = pnrInfo.substring(7, pnrInfo.length - 3);
+    }
+    console.log("pnrProcess= ", pnrProcess);
+    pnrData = JSON.parse(pnrProcess);
     if (pnrData !== null) {
       pnrSum = pnrData["summary"];
       console.log("pnrSum : ", pnrSum);
