@@ -68,6 +68,7 @@ export function FlightInfoSubForm() {
               origin_code: departureAirport,
               destination_code: arrivalAirport,
               airline_code: airline,
+              session_id: sessionStorage.getItem("sessionId"),
             }),
           });
 

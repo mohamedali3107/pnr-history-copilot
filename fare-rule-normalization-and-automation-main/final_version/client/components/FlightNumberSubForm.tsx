@@ -80,7 +80,10 @@ export function FlightNumberSubForm() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ flight_number: flightNumber }),
+            body: JSON.stringify({
+              flight_number: flightNumber,
+              session_id: sessionStorage.getItem("sessionId"),
+            }),
           });
 
           if (response.ok) {
