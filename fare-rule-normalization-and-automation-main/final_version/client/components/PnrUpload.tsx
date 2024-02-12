@@ -1,31 +1,15 @@
-import React, { useState, ChangeEvent, useRef } from "react";
+import React, { useState, ChangeEvent, useRef, useEffect } from "react";
 import { FaRegFilePdf } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { useChatStore } from "./chatStore";
 import { useLoadingStore } from "./Loading";
-import { Input } from "@/components/ui/input";
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area-shadcn";
-import {
-  Form,
-  FormControl,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area-shadcn";
 
 const truncateFileName = (fileName: string, maxLength: number) => {
   return fileName.length > maxLength
@@ -49,29 +33,44 @@ type PassengerData = {
   "general remarks": string[];
 };
 
-export function PnrUpload() {
+type UpdateType = {
+  "modification date": string;
+  object: string;
+  author: string;
+};
+
+type AnswerType = {
+  summary: PassengerData;
+  updates: UpdateType[];
+};
+
+export function PnrUpload({
+  setPnrInfo,
+  pnrInfo,
+}: {
+  setPnrInfo: React.Dispatch<React.SetStateAction<string | null>>;
+  pnrInfo: string | null;
+}) {
   const { addToHistory } = useChatStore();
   const { setIsLoading } = useLoadingStore();
   const [pnrSummary, setPnrSummary] = useState<string | null>(null);
-  let pnrData: PassengerData | null = null;
-  if (pnrSummary !== null) {
-    pnrData = JSON.parse(pnrSummary);
-  }
   const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
   const pnrInputRef = useRef<HTMLInputElement>(null);
+  let pnrData: AnswerType | null = null;
+  let pnrSum: PassengerData | null = null;
+
   console.log("pnrInputRef : ", pnrInputRef);
+
+  //Fonction pour envoyer le PNR au back et récupérer le summary et la timeline
   const uploadPnr = async (pnr: File) => {
+    let response;
     setIsLoading(true);
     const formData = new FormData();
     formData.append("pnr", pnr);
-
     const urls = [
       "http://127.0.0.1:8000/upload_pnr",
       "https://f23-p3-amadeus.paris-digital-lab.fr/back/upload_pnr",
     ];
-
-    let response;
-
     for (const url of urls) {
       try {
         response = await fetch(url, {
@@ -82,14 +81,9 @@ export function PnrUpload() {
         if (response.ok) {
           try {
             const data = await response.json();
-            console.log("data2 : ", data.paragraph);
-            setPnrSummary(data.paragraph);
-            sessionStorage.setItem("sessionId", data.session_id);
-            // addToHistory({
-            //   content: data.paragraph,
-            //   role: "assistant",
-            //   id: "pdf",
-            // });
+            console.log("pnrInfo : ", data.paragraph);
+            setPnrInfo(data.paragraph);
+            // setPnrSummary(data.paragraph);
             setIsLoading(false);
           } catch (error) {
             console.error("Error uploading pnr:", error);
@@ -103,15 +97,32 @@ export function PnrUpload() {
     }
   };
 
+  //Code qui définit le summary et la timeline
+  if (pnrInfo !== null) {
+    let pnrProcess: string = pnrInfo;
+    if (pnrInfo[0] === "`") {
+      console.log("Chat GPT fait de la D");
+      pnrProcess = pnrInfo.substring(7, pnrInfo.length - 3);
+    }
+    console.log("pnrProcess= ", pnrProcess);
+    pnrData = JSON.parse(pnrProcess);
+    if (pnrData !== null) {
+      pnrSum = pnrData["summary"];
+      console.log("pnrSum : ", pnrSum);
+      console.log("timeline : ", pnrData["updates"]);
+    }
+  }
+
+  //Fonction pour uploader un PNR
   const handlePnrChange = (event: ChangeEvent<HTMLInputElement>) => {
     const pnr = event.target.files?.[0];
     setSelectedPnr(pnr || null);
-
     if (pnr) {
       uploadPnr(pnr);
     }
   };
 
+  //Fonction pour supprimer un PNR
   const handleDeletePnr = () => {
     setSelectedPnr(null);
     // Reset the pnr input value
@@ -169,12 +180,13 @@ export function PnrUpload() {
           </div>
         )}
       </div>
-      {pnrSummary && selectedPnr && (
+      {pnrInfo && selectedPnr && (
         <ScrollArea type="always" style={{ height: 500 }}>
           <p className="text-secondary font-semibold">Passengers :</p>
           <ul>
             {pnrData &&
-              pnrData["passengers name"].map((passenger, index) => (
+              pnrSum &&
+              pnrSum["passengers name"].map((passenger, index) => (
                 <li key={index} className="text-white text-sm ml-4">
                   • {passenger}
                 </li>
@@ -182,7 +194,7 @@ export function PnrUpload() {
           </ul>
           <AccordionItem value="item-1">
             <p className="text-secondary font-semibold mt-2">Flights :</p>
-            {pnrData?.flights.map((flight, index) => (
+            {pnrSum?.flights.map((flight, index) => (
               <AccordionItem key={index} value={`flight-${index}`}>
                 <AccordionTrigger className="text-sm text-white">{`${flight.depart} to ${flight.arrival}`}</AccordionTrigger>
                 <AccordionContent>
@@ -218,7 +230,8 @@ export function PnrUpload() {
           <p className="text-secondary font-semibold mt-2">General remarks :</p>
           <ul>
             {pnrData &&
-              pnrData["general remarks"].map((remark, index) => (
+              pnrSum &&
+              pnrSum["general remarks"].map((remark, index) => (
                 <li key={index} className="text-white text-sm indent-4">
                   • {remark}
                 </li>
