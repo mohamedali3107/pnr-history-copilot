@@ -83,6 +83,7 @@ export function PnrUpload({
             const data = await response.json();
             console.log("pnrInfo : ", data.paragraph);
             setPnrInfo(data.paragraph);
+            sessionStorage.setItem("sessionId", data.session_id);
             // setPnrSummary(data.paragraph);
             setIsLoading(false);
           } catch (error) {
