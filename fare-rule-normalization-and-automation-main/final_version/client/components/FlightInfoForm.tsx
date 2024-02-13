@@ -5,6 +5,7 @@ import { FlightInfoSubForm } from "./FlightInfoSubForm";
 import { BrowsePdfButton } from "./BrowsePdfButton";
 import { PnrUpload } from "./PnrUpload";
 import * as Tabs from "@radix-ui/react-tabs";
+import { FareRules } from "./FareRules";
 
 type UpdateType = {
   "modification date": string;
@@ -61,9 +62,10 @@ export function FlightInfoForm({
             value="tab2"
           >
             <Accordion type="single" collapsible defaultValue="item-1">
-              {FlightNumberSubForm()}
+              {/* {FlightNumberSubForm()}
               {FlightInfoSubForm()}
-              {BrowsePdfButton()}
+              {BrowsePdfButton()} */}
+              <FareRules selectedPnr={selectedPnr} />
             </Accordion>
           </Tabs.Content>
         </Tabs.Root>
