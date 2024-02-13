@@ -19,9 +19,12 @@ const truncateFileName = (fileName: string, maxLength: number) => {
 
 type Flight = {
   depart: string;
+  "depart code": string;
   arrival: string;
+  "arrival code": string;
   date: string;
   "flight number": string;
+  "airline code": string;
   "Special Service Requests": string[];
   "remarks about the fly": string[];
 };
@@ -42,22 +45,27 @@ type UpdateType = {
 type AnswerType = {
   summary: PassengerData;
   updates: UpdateType[];
+  pnr_number: string;
 };
 
 export function PnrUpload({
   setPnrInfo,
   pnrInfo,
+  selectedPnr,
+  setSelectedPnr,
 }: {
   setPnrInfo: React.Dispatch<React.SetStateAction<string | null>>;
   pnrInfo: string | null;
+  selectedPnr: File | null;
+  setSelectedPnr: React.Dispatch<React.SetStateAction<File | null>>;
 }) {
   const { addToHistory } = useChatStore();
   const { setIsLoading } = useLoadingStore();
-  const [pnrSummary, setPnrSummary] = useState<string | null>(null);
-  const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
+  //const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
   const pnrInputRef = useRef<HTMLInputElement>(null);
   let pnrData: AnswerType | null = null;
   let pnrSum: PassengerData | null = null;
+  let pnrNumber: string | null = null;
 
   console.log("pnrInputRef : ", pnrInputRef);
 
@@ -109,6 +117,7 @@ export function PnrUpload({
     pnrData = JSON.parse(pnrProcess);
     if (pnrData !== null) {
       pnrSum = pnrData["summary"];
+      pnrNumber = pnrData["pnr_number"];
       console.log("pnrSum : ", pnrSum);
       console.log("timeline : ", pnrData["updates"]);
     }
@@ -183,7 +192,13 @@ export function PnrUpload({
       </div>
       {pnrInfo && selectedPnr && (
         <ScrollArea type="always" style={{ height: 500 }}>
-          <p className="text-secondary font-semibold">Passengers :</p>
+          <p className=" text-white mt-2">
+            <span className="font-semibold text-base text-secondary mr-2">
+              PNR Number:{" "}
+            </span>
+            {pnrNumber}
+          </p>
+          <p className="text-secondary font-semibold mt-2">Passengers :</p>
           <ul>
             {pnrData &&
               pnrSum &&
