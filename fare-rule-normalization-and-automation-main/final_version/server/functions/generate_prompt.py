@@ -6,6 +6,10 @@ def pnr_prompt(pnr):
         This is how you read the PNR: 
         
         Each line with numbers (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or a bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol in the end. For instance, in the line RF-NMC-US/WSGTMFLS, WSGTMFLS is the identifier of the person. 
+        The PNR number is written in the first lines and has 6 characters. For example, in this PNR history:
+        "RP/NCE1A0950/NCE1A0950            NR/SU  25NOV23/0443Z   J3HKHL
+        NCE1A0950/0108FR/25NOV23", the PNR number is J3HKHL. 
+        
         Here are additionnal codes: 
         Code used for creating a PNR (Passenger Name Record):
         EO	Origin ETR
@@ -304,17 +308,23 @@ question_paragraph_pnr = """
             "flights": [
                 {
                     "depart": 
+                    "depart code": DEPARTING AIRPORT CODE
                     "arrival":
-                    "date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                    "arrival code": ARRIVAL AIRPORT CODE
+                    "date": DATE WRITTEN IN THE FORMAT YYYY-MM-DD
                     "flight number":
+                    "airline code": FLIGHT COMPANY CODE
                     "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
                     "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
                 },
                 {
                     "depart": 
+                    "depart code": DEPARTING AIRPORT CODE
                     "arrival":
-                    "date":
+                    "arrival code": ARRIVAL AIRPORT CODE
+                    "date": DATE WRITTEN IN THE FORMAT YYYY-MM-DD
                     "flight number":
+                    "airline code": FLIGHT COMPANY CODE
                     "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
                     "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
                 }
@@ -333,7 +343,8 @@ question_paragraph_pnr = """
                 "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
                 "author": AUTHOR OF THE UPDATE 
             }
-        ]
+        ],
+        "pnr_number": PNR NUMBER 
         
     }
     
