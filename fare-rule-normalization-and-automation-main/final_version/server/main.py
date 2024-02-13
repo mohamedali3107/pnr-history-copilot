@@ -48,6 +48,7 @@ class ChatSession():
     qa_chain_PDF : ConversationalRetrievalChain
     qa_chain_WEB : ConversationalRetrievalChain
     chat_history : ConversationBufferMemory
+    chat_history_fare_rules : ConversationBufferMemory
 
     def __init__(self):
         self.qa_chain_PNR = None
@@ -55,12 +56,16 @@ class ChatSession():
         self.qa_chain_PDF = None
         self.qa_chain_WEB = None
         self.chat_history = ConversationBufferMemory(memory_key="chat_history", output_key="answer")
+        self.chat_history_fare_rules = ConversationBufferMemory(memory_key="chat_history_fare_rules", output_key="answer")
+
 
     def __str__(self):
         string = "QA Chain : \n"
         string += str(self.qa_chain_PNR)
         string += str("\nChat History : \n")
         string += str(self.chat_history)
+        string += str("\nChat History Fare Rules: \n")
+        string += str(self.chat_history_fare_rules)
         string += str("\n")
         return string
 
@@ -72,21 +77,24 @@ sessions : Dict[int, ChatSession] = dict()
 async def get_answer(question: str = Body(..., embed=True), session_id: str = Body(..., embed=True),):
     print("Session : ", session_id)
     print(sessions[session_id])
-
     response = answer(question, sessions[session_id].qa_chain_PNR)
-    #response = answer(question, sessions[session_id].qa_chain_ATPCO)
-
-    # if response == "Unknown":
-    #     response = answer(question, sessions[session_id].qa_chain_PDF)
-
-    # if response == "Unknown":
-    #     response = answer(question, sessions[session_id].qa_chain_WEB)
-
     if response == "Unknown":
         response = "Please upload a PNR History first."
-
     print({"answer": response})
+    return {"answer": response}
 
+@app.post("/answer_chat_fare_rules")
+async def get_answer(question: str = Body(..., embed=True), session_id: str = Body(..., embed=True),):
+    print("Session : ", session_id)
+    print(sessions[session_id])
+    response = answer(question, sessions[session_id].qa_chain_ATPCO)
+    if response == "Unknown":
+        response = answer(question, sessions[session_id].qa_chain_PDF)
+    if response == "Unknown":
+        response = answer(question, sessions[session_id].qa_chain_WEB)
+    if response == "Unknown":
+        response = "An error has occured with fare rules retrieving..."
+    print({"answer": response})
     return {"answer": response}
 
 # This function takes as input the departure date, the origin code, the destination code and the airline code
@@ -117,14 +125,14 @@ async def fill_template(
 
     if have_fare_rule:
         prompt = get_prompt(source="ATPCO")
-        sessions[session_id].qa_chain_ATPCO = create_qa_chain(vector_store_ATPCO, sessions[session_id].chat_history, prompt)
+        sessions[session_id].qa_chain_ATPCO = create_qa_chain(vector_store_ATPCO, sessions[session_id].chat_history_fare_rules, prompt)
 
     prompt = get_prompt(source="Webtext")
     #global qa_chain_WEB
 
     have_webtext, paragraph_webtext = False, "nothing"
     if vector_store_WEB:
-        sessions[session_id].qa_chain_WEB = create_qa_chain(vector_store_WEB, sessions[session_id].chat_history, prompt)
+        sessions[session_id].qa_chain_WEB = create_qa_chain(vector_store_WEB, sessions[session_id].chat_history_fare_rules, prompt)
         chain_paragraph_web = chain_paragraph(
             vector_store_WEB, prompt_paragraph_web, nb_chunks=10
         )
@@ -148,6 +156,9 @@ async def fill_template_from_DB(
     flight_number: str = Body(..., embed=True),
     session_id : str = Body(..., embed=True),
 ):
+    session_id = str(uuid.uuid4())
+    global sessions
+    sessions[session_id] = ChatSession()
     flight_number = flight_number.upper()
     fare_rules_list = get_fare_rules_from_DB(flight_number)
 
@@ -164,7 +175,7 @@ async def fill_template_from_DB(
     if have_fare_rule:
         prompt = get_prompt(source="ATPCO")
         #global qa_chain_ATPCO
-        sessions[session_id].qa_chain_ATPCO = create_qa_chain(vector_store_ATPCO, sessions[session_id].chat_history, prompt)
+        sessions[session_id].qa_chain_ATPCO = create_qa_chain(vector_store_ATPCO, sessions[session_id].chat_history_fare_rules, prompt)
 
     prompt = get_prompt(source="Webtext")
     #global qa_chain_WEB
@@ -198,7 +209,7 @@ async def upload_pdf(pdf: UploadFile, session_id : str = Body(..., embed=True),)
     prompt = get_prompt(source="PDF")
     #global qa_chain_PDF
     print("prompt : ", prompt)
-    sessions[session_id].qa_chain_PDF = create_qa_chain(vector_store_PDF, sessions[session_id].chat_history, prompt)
+    sessions[session_id].qa_chain_PDF = create_qa_chain(vector_store_PDF, sessions[session_id].chat_history_fare_rules, prompt)
     chain_paragraph_PDF = chain_paragraph(
         vector_store_PDF, prompt_paragraph_PDF, nb_chunks=12, search_type="similarity"
     )

@@ -47,14 +47,17 @@ type AnswerType = {
 export function PnrUpload({
   setPnrInfo,
   pnrInfo,
+  selectedPnr,
+  setSelectedPnr,
 }: {
   setPnrInfo: React.Dispatch<React.SetStateAction<string | null>>;
   pnrInfo: string | null;
+  selectedPnr: File | null;
+  setSelectedPnr: React.Dispatch<React.SetStateAction<File | null>>;
 }) {
   const { addToHistory } = useChatStore();
   const { setIsLoading } = useLoadingStore();
-  const [pnrSummary, setPnrSummary] = useState<string | null>(null);
-  const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
+  //const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
   const pnrInputRef = useRef<HTMLInputElement>(null);
   let pnrData: AnswerType | null = null;
   let pnrSum: PassengerData | null = null;
