@@ -35,6 +35,7 @@ type UpdateType = {
   "modification date": string;
   object: string;
   author: string;
+  agency: string;
 };
 
 type AnswerType = {
@@ -111,7 +112,7 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
     // const up: string = `Date  : ${sampleTimeline[index]["modification date"]} \nModification : ${sampleTimeline[index].object}, \nAuthor : ${sampleTimeline[index].author}`;
     // addToHistory({ content: up, role: "system", id: "2" });
     if (pnrTimeline !== null) {
-      const updateSummary: string = `Date  : ${pnrTimeline[index]["modification date"]} \nModification : ${pnrTimeline[index].object}, \nAuthor : ${pnrTimeline[index].author}`;
+      const updateSummary: string = `Date  : ${pnrTimeline[index]["modification date"]} \nModification : ${pnrTimeline[index].object} \nAuthor : ${pnrTimeline[index].author} \nAgency : ${pnrTimeline[index].agency}`;
       addToHistory({ content: updateSummary, role: "system", id: "2" });
     }
   };

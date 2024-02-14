@@ -7,18 +7,21 @@ type UpdateType = {
   "modification date": string;
   object: string;
   author: string;
+  agency: string;
 };
 
 const defaultTimeline = [
   {
     "modification date": "12/13/23",
     object: "Option for ticketing added with deadline",
-    author: "1A/NCE1A0955",
+    author: "0001AA",
+    agency: "NCE1A0955",
   },
   {
     "modification date": "12/13/23",
     object: "Cancellation policy added due to no ticket",
-    author: "1APUB/ATL-0001AA/NCE1A0955",
+    author: "0001AA",
+    agency: "NCE1A0955",
   },
 ];
 
