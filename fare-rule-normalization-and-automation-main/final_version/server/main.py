@@ -42,6 +42,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def parse_flight_info(info_string):
+    info_dict = {}
+    changes_conditions = {}
+    refund_conditions = {}
+
+    # Split the string by whole sentences and strip each part
+    parts = [part.strip() for part in info_string.split('Changes condition')]
+
+    # Extract departure and arrival
+    info_dict['depart'] = parts[0].split('- DEPARTURE:')[-1].strip().split('- ARRIVAL:')[0].strip()
+    info_dict['arrival'] = parts[0].split('- ARRIVAL:')[-1].split('-')[0].strip()
+
+    # Extract changes conditions
+    changes_conditions['before_departure'] = parts[1].split(':')[-1].strip()
+    changes_conditions['no_show_at_first_flight'] = parts[2].split(':')[-1].strip()
+    changes_conditions['after_departure'] = parts[3].split(':')[-1].strip()
+    parts = parts[-1].split("Refund condition")
+    changes_conditions['no_show_at_subsequent_flight'] = parts[0].split(':')[-1].strip()
+
+    # Extract refund conditions
+    refund_conditions['before_departure'] = parts[1].split(':')[-1].strip()
+    refund_conditions['no_show_at_first_flight'] = parts[2].split(':')[-1].strip()
+    refund_conditions['after_departure'] = parts[3].split(':')[-1].strip()
+    refund_conditions['no_show_at_subsequent_flight'] = parts[4].split(':')[-1].strip()
+
+    # Populate the main dictionary
+    info_dict['changes_conditions'] = changes_conditions
+    info_dict['refund_conditions'] = refund_conditions
+
+    return info_dict
+
+
+
 class ChatSession():
     qa_chain_PNR : ConversationalRetrievalChain
     qa_chain_ATPCO : ConversationalRetrievalChain
@@ -106,6 +139,7 @@ async def fill_template(
     airline_code: str = Body(..., embed=True),
     session_id: str = Body(..., embed=True),
 ):
+    print("Fetching fare rules...")
     origin_code = origin_code.upper()
     destination_code = destination_code.upper()
     airline_code = airline_code.upper()
@@ -143,6 +177,12 @@ async def fill_template(
             "paragraph": f"Key points retrieved from the web page :\n {paragraph}"
         }
 
+    
+    for i in range(len(fares_to_display)):
+        fares_to_display[i] = parse_flight_info(fares_to_display[i])
+    
+    print(fares_to_display)
+    
     return {
         "fares_to_display": fares_to_display,
         "have_fare_rule": have_fare_rule,

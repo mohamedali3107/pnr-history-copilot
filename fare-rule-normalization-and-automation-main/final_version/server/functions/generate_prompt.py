@@ -1,13 +1,22 @@
 from langchain.prompts import PromptTemplate
 
 def pnr_prompt(pnr):
-    prompt_paragraph_pnr_str = f"""
-        INSTRUCTIONS:
-        Your are an assistant for travel agents and expert in reading PNRs. Your task is to analyse the provided pnr and give a concise answer written in natural language only and not include quotes from the PNR. I don't want you to tell what element in the PNR history you used. Try also to give all détails relative to the question following the chronological order mentioned in the pnr. If the question is not clear, always request more details to answer. If you don't know ,say simply "I dont know" or "the provided pnr does not contain such information".   
+    prompt_paragraph_pnr_str = """
+        INSTRUCTIONS:Your are an assistant for travel agents and expert in reading PNRs. Your answer must be concise and written in natural language only and not include quotes from the PNR. I don't want you to tell what element in the PNR history you used. Try also to give all details relative to the question following the chronological order mentioned in the pnr. If the question is not clear, always request more details to answer. If you don't know ,say simply "I dont know" or "the provided pnr does not contain such information".
+        This is how you read the PNR: 
+        
+        This is how you read the PNR: 
+        Each line with numbers (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or a bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol in the end. You can find the travel agent identifier who made the change in the format NNNNLL (N number, L letter) in the RF line after a modification 00X.
+        For example in the lines: 
+        - "000 RF-SS-QA-RES-TKT/0108FR CR-NCE1A1234 12345 SU 0108FR/
+        ES-09AC13A6 NCE1A00QA1234 1234 NCE1A00QA 25NOV0441Z", here the travel agent identifier is 0108FR and the agency is NCE1A1234
+        - "001 RF-1APUB/ATL-0001AA/NCE1A0955 CR-NCE1A1234 12345     
+         /DS 25NOV0441Z", here the travel agent identifier is 0001AA and the agency is NCE1A1234
+        - "004 RF-SS CR-NCE1A1234 12345 SU 0019FR/ES-09AC133A MUC1A0
+       1234 12340 28NOV0244Z", here the travel agent identifier is 0019FR and the agency is NCE1A1234
+        
         You have to follow all the codes used by Amadeus to create their PNRs, do not invent any information: 
-        Each numbered line (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol at the end. For instance, in the line RF-NMC-US/WSGTMFLS, WSGTMFLS is the identifier of the person.
-       
-        Here are additional codes: 
+        Here are additionnal codes: 
         Code used for creating a PNR (Passenger Name Record):
         EO	Origin ETR
         FO	Financial element origin
@@ -386,14 +395,14 @@ def prompt_summary_pnr(pnr):
         INSTRUCTIONS: I want you to be an assistant for travel agents and help them with PNRs. Your answer must be concise and written in natural language only and not include quotes from the PNR. I don't want you to tell what element in the PNR history you used. 
         
         This is how you read the PNR: 
-        Each line with numbers (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or a bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol in the end. You can find the user id who made the change in the format NNNNLL (N number, L letter) in the RF line after a modification 00X.
+        Each line with numbers (001...002...003...) corresponds to navigation within a PNR History. Whenever an individual or a bot navigates or modifies the PNR History, it leaves a footprint marked by the RF symbol in the end. You can find the travel agent identifier who made the change in the format NNNNLL (N number, L letter) in the RF line after a modification 00X.
         For example in the lines: 
         - "000 RF-SS-QA-RES-TKT/0108FR CR-NCE1A1234 12345 SU 0108FR/
-        ES-09AC13A6 NCE1A00QA1234 1234 NCE1A00QA 25NOV0441Z", here the user id is 0108FR and the agency is NCE1A1234
+        ES-09AC13A6 NCE1A00QA1234 1234 NCE1A00QA 25NOV0441Z", here the travel agent identifier is 0108FR and the agency is NCE1A1234
         - "001 RF-1APUB/ATL-0001AA/NCE1A0955 CR-NCE1A1234 12345     
-         /DS 25NOV0441Z", here the user id is 0001AA and the agency is NCE1A1234
+         /DS 25NOV0441Z", here the travel agent identifier is 0001AA and the agency is NCE1A1234
         - "004 RF-SS CR-NCE1A1234 12345 SU 0019FR/ES-09AC133A MUC1A0
-       1234 12340 28NOV0244Z", here the user id is 0019FR and the agency is NCE1A1234
+       1234 12340 28NOV0244Z", here the travel agent identifier is 0019FR and the agency is NCE1A1234
         
         Here are the other codes:
         Code used for creating a PNR (Passenger Name Record):
@@ -546,13 +555,13 @@ question_paragraph_pnr = """
             {
                 "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": USER ID OF THE ONE WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
+                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
                 "agency": AGENCY ID, WRITTEN IN THE RF LINE
             },
             {
                 "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": USER ID OF THE ONE WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
+                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
                 "agency": AGENCY ID, WRITTEN IN THE RF LINE
             }
         ]
@@ -569,14 +578,14 @@ question_updates_pnr = """Please fill the following template. Order the list "up
             {
                 "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
                 "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": USER ID OF THE ONE WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
+                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
                 "agency": AGENCY ID, WRITTEN IN THE RF LINE
                 
             },
             {
                 "modification date": DATE WRITTEN IN THE FORMAT MM/DD/YY
                 "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": USER ID OF THE ONE WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
+                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
                 "agency": AGENCY ID, WRITTEN IN THE RF LINE
                 
             }

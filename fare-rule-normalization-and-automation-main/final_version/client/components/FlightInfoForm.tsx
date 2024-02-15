@@ -1,18 +1,9 @@
 import React, { useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
-import { FlightNumberSubForm } from "./FlightNumberSubForm";
-import { FlightInfoSubForm } from "./FlightInfoSubForm";
-import { BrowsePdfButton } from "./BrowsePdfButton";
 import { PnrUpload } from "./PnrUpload";
 import * as Tabs from "@radix-ui/react-tabs";
 import { FareRules } from "./FareRules";
-
-type UpdateType = {
-  "modification date": string;
-  object: string;
-  author: string;
-  agency: string;
-};
+import { FlightInfo } from "./types";
 
 export function FlightInfoForm({
   setPnrInfo,
@@ -22,6 +13,7 @@ export function FlightInfoForm({
   pnrInfo: string | null;
 }) {
   const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
+  const [fareRules, setFareRules] = useState<FlightInfo[] | null>(null);
   return (
     <div className="mt-3 font-sans">
       <div>
@@ -66,7 +58,12 @@ export function FlightInfoForm({
               {/* {FlightNumberSubForm()}
               {FlightInfoSubForm()}
               {BrowsePdfButton()} */}
-              <FareRules selectedPnr={selectedPnr} />
+              <FareRules
+                selectedPnr={selectedPnr}
+                fareRules={fareRules}
+                setFareRules={setFareRules}
+                pnrInfo={pnrInfo}
+              />
             </Accordion>
           </Tabs.Content>
         </Tabs.Root>
