@@ -40,6 +40,7 @@ type UpdateType = {
   "modification date": string;
   object: string;
   author: string;
+  agency: string;
 };
 
 type AnswerType = {

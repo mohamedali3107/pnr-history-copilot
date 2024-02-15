@@ -11,6 +11,7 @@ type UpdateType = {
   "modification date": string;
   object: string;
   author: string;
+  agency: string;
 };
 
 export function Sidebar({
