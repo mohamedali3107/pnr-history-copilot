@@ -237,11 +237,6 @@ def pnr_prompt(pnr):
         19. Were there any remarks on queue. If presence of RMQ in the PNR, you should display the complete list of statements after RMQThough RMQ is present in the given PNR it didn’t recognize the Code as RMQ 
 
         20. Any cancellation for fare. The cancelled fare should be located based on XF/FA and the date in the pnr data , for example XF/FA 016-8029875020/ETUA/USD3105.80/15DEC23 
-        CONTEXT: ```{context}```
-        
-        QUESTION: {question}
-        
-        SUMMARY: \n
         """
     prompt_paragraph_pnr_str4 = """
         \n
@@ -313,13 +308,7 @@ def pnr_prompt(pnr):
 
         QUESTION: What is ticket price?
         ANSWER: Ticket price is the price paid by the agency. It is the actual ticket value, i.e. base fare + taxes.
-                    
-
-        CONTEXT: ```{context}```
-
-        QUESTION: {question}
-
-        SUMMARY: \n"""
+        """
     prompt_paragraph_pnr_str5 = """ \n Here some feedbacks from experts in reading PNRs that test some questions and return theses observations. you need to take this into account to generate your answers.
         
         Observations w.r.t LLM’s response: 
@@ -340,9 +329,10 @@ def pnr_prompt(pnr):
         - The cancelled fare should be located based on XF/FA and the date in the PNR data is 15th Dec, for e.g. XF/FA 016-8029875020/ETUA/USD3105.80/15DEC23 
 
         """
+        #+ prompt_paragraph_pnr_str3 + prompt_paragraph_pnr_str4 
 
     prompt_paragraph_pnr = PromptTemplate(
-        input_variables=["context", "question"], template= prompt_paragraph_pnr_str + pnr + prompt_paragraph_pnr_str2 + prompt_paragraph_pnr_str3 + prompt_paragraph_pnr_str4 
+        input_variables=["context", "question","chat_history"], template= prompt_paragraph_pnr_str + pnr + prompt_paragraph_pnr_str2 
     )
     return prompt_paragraph_pnr
 
@@ -533,17 +523,23 @@ question_paragraph_pnr = """
             "flights": [
                 {
                     "depart": 
+                    "depart code": DEPARTING AIRPORT CODE
                     "arrival":
-                    "date": DATE WRITTEN IN THE FORMAT MM/DD/YY
+                    "arrival code": ARRIVAL AIRPORT CODE
+                    "date": DATE WRITTEN IN THE FORMAT YYYY-MM-DD
                     "flight number":
+                    "airline code": FLIGHT COMPANY CODE
                     "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
                     "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
                 },
                 {
                     "depart": 
+                    "depart code": DEPARTING AIRPORT CODE
                     "arrival":
-                    "date":
+                    "arrival code": ARRIVAL AIRPORT CODE
+                    "date": DATE WRITTEN IN THE FORMAT YYYY-MM-DD
                     "flight number":
+                    "airline code": FLIGHT COMPANY CODE
                     "Special Service Requests": [LIST OF OPTIONS WELL WRITTEN VERY CONCISE] or None
                     "remarks about the fly": [LIST OF REMARKS WELL WRITTEN VERY CONCISE] or None
                 }
@@ -555,16 +551,15 @@ question_paragraph_pnr = """
             {
                 "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
-                "agency": AGENCY ID, WRITTEN IN THE RF LINE
+                "author": AUTHOR OF THE UPDATE 
             },
             {
                 "modification date": DATE WRITTEN IN THE FORMAT 12 Oct 2022
                 "object": MAIN POINTS OF WHAT HAS BEEN WHAT HAS BEEN MODIFIED/ADDED/DELETED WELL WRITTEN VERY CONCISE
-                "author": TRAVEL AGENT IDENTIFIER OF THE TRAVEL AGENT WHO MADE THE UPDATE, WRITTEN IN THE RF LINE IN THE FORMAT NNNNLL (Number, Letter)
-                "agency": AGENCY ID, WRITTEN IN THE RF LINE
+                "author": AUTHOR OF THE UPDATE 
             }
-        ]
+        ],
+        "pnr_number": PNR NUMBER 
         
     }
     
