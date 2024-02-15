@@ -1,9 +1,0 @@
-[server]
-port=8501 # change port number. By default streamlit uses 8501 port
-headless=true # This will eliminate automatically open browser
-enableCORS=true
-# enableXsrfProtection=false 
-# enableWebsocketCompression=false
-[browser] # This ip and port will show in command prompt
-serverAddress = "f23-p2-airules.paris-digital-lab.fr" # Put your Local IP or Domain Name
-serverPort = 8501
