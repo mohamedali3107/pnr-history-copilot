@@ -55,12 +55,9 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
     if (pnrInfo[0] === "`") {
       pnrProcess = pnrInfo.substring(7, pnrInfo.length - 3);
     }
-    console.log("pnrProcess= ", pnrProcess);
     pnrData = JSON.parse(pnrProcess);
     if (pnrData !== null) {
       pnrTimeline = pnrData["updates"];
-      console.log("pnrSum : ", pnrTimeline);
-      console.log("timeline : ", pnrData["updates"]);
     }
   }
 
@@ -88,11 +85,9 @@ export function ConversationArea({ pnrInfo }: { pnrInfo: string | null }) {
             session_id: sessionStorage.getItem("sessionId"),
           }),
         });
-        console.log("response :", response);
         if (response.ok) {
           try {
             const data = await response.json();
-            console.log("data : ", data);
             setIsLoading(false);
 
             addToHistory({ content: data.answer, role: "system", id: "2" });

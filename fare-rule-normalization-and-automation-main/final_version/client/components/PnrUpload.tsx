@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useRef, useEffect } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { FaRegFilePdf } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -16,38 +16,7 @@ const truncateFileName = (fileName: string, maxLength: number) => {
     ? `${fileName.substring(0, maxLength)}...`
     : fileName;
 };
-
-type Flight = {
-  depart: string;
-  "depart code": string;
-  arrival: string;
-  "arrival code": string;
-  date: string;
-  "flight number": string;
-  "airline code": string;
-  "Special Service Requests": string[];
-  "remarks about the fly": string[];
-};
-
-type PassengerData = {
-  "passengers name": string[];
-  flights: Flight[];
-  "ticket numnber": string[];
-  "general remarks": string[];
-};
-
-type UpdateType = {
-  "modification date": string;
-  object: string;
-  author: string;
-  agency: string;
-};
-
-type AnswerType = {
-  summary: PassengerData;
-  updates: UpdateType[];
-  pnr_number: string;
-};
+import { PassengerData, AnswerType } from "./types";
 
 export function PnrUpload({
   setPnrInfo,
@@ -60,15 +29,11 @@ export function PnrUpload({
   selectedPnr: File | null;
   setSelectedPnr: React.Dispatch<React.SetStateAction<File | null>>;
 }) {
-  const { addToHistory } = useChatStore();
   const { setIsLoading } = useLoadingStore();
-  //const [selectedPnr, setSelectedPnr] = useState<File | null>(null);
   const pnrInputRef = useRef<HTMLInputElement>(null);
   let pnrData: AnswerType | null = null;
   let pnrSum: PassengerData | null = null;
   let pnrNumber: string | null = null;
-
-  console.log("pnrInputRef : ", pnrInputRef);
 
   //Fonction pour envoyer le PNR au back et récupérer le summary et la timeline
   const uploadPnr = async (pnr: File) => {
@@ -90,10 +55,8 @@ export function PnrUpload({
         if (response.ok) {
           try {
             const data = await response.json();
-            console.log("pnrInfo : ", data.paragraph);
             setPnrInfo(data.paragraph);
             sessionStorage.setItem("sessionId", data.session_id);
-            // setPnrSummary(data.paragraph);
             setIsLoading(false);
           } catch (error) {
             console.error("Error uploading pnr:", error);
@@ -111,16 +74,12 @@ export function PnrUpload({
   if (pnrInfo !== null) {
     let pnrProcess: string = pnrInfo;
     if (pnrInfo[0] === "`") {
-      console.log("Chat GPT fait de la D");
       pnrProcess = pnrInfo.substring(7, pnrInfo.length - 3);
     }
-    console.log("pnrProcess= ", pnrProcess);
     pnrData = JSON.parse(pnrProcess);
     if (pnrData !== null) {
       pnrSum = pnrData["summary"];
       pnrNumber = pnrData["pnr_number"];
-      console.log("pnrSum : ", pnrSum);
-      console.log("timeline : ", pnrData["updates"]);
     }
   }
 

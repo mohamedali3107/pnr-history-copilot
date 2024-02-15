@@ -46,7 +46,6 @@ export function BrowsePdfButton() {
         if (response.ok) {
           try {
             const data = await response.json();
-            console.log(data);
             addToHistory({
               content: data.paragraph,
               role: "assistant",
