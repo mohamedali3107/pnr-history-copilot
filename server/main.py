@@ -108,18 +108,13 @@ sessions : Dict[int, ChatSession] = dict()
 # Get bot response
 @app.post("/answer_chat")
 async def get_answer(question: str = Body(..., embed=True), session_id: str = Body(..., embed=True),):
-    print("Session : ", session_id)
-    print(sessions[session_id])
     response = answer(question, sessions[session_id].qa_chain_PNR)
     if response == "Unknown":
         response = "Please upload a PNR History first."
-    print({"answer": response})
     return {"answer": response}
 
 @app.post("/answer_chat_fare_rules")
 async def get_answer(question: str = Body(..., embed=True), session_id: str = Body(..., embed=True),):
-    print("Session : ", session_id)
-    print(sessions[session_id])
     response = answer(question, sessions[session_id].qa_chain_ATPCO)
     if response == "Unknown":
         response = answer(question, sessions[session_id].qa_chain_PDF)
@@ -127,7 +122,6 @@ async def get_answer(question: str = Body(..., embed=True), session_id: str = Bo
         response = answer(question, sessions[session_id].qa_chain_WEB)
     if response == "Unknown":
         response = "An error has occured with fare rules retrieving..."
-    print({"answer": response})
     return {"answer": response}
 
 # This function takes as input the departure date, the origin code, the destination code and the airline code
@@ -180,9 +174,7 @@ async def fill_template(
     
     for i in range(len(fares_to_display)):
         fares_to_display[i] = parse_flight_info(fares_to_display[i])
-    
-    print(fares_to_display)
-    
+        
     return {
         "fares_to_display": fares_to_display,
         "have_fare_rule": have_fare_rule,
@@ -248,7 +240,6 @@ async def upload_pdf(pdf: UploadFile, session_id : str = Body(..., embed=True),)
     vector_store_PDF = u.pdf_to_vector_store(pdf)
     prompt = get_prompt(source="PDF")
     #global qa_chain_PDF
-    print("prompt : ", prompt)
     sessions[session_id].qa_chain_PDF = create_qa_chain(vector_store_PDF, sessions[session_id].chat_history_fare_rules, prompt)
     chain_paragraph_PDF = chain_paragraph(
         vector_store_PDF, prompt_paragraph_PDF, nb_chunks=12, search_type="similarity"
@@ -264,7 +255,6 @@ async def upload_pnr(pnr: UploadFile):
     session_id = str(uuid.uuid4())
     global sessions
     sessions[session_id] = ChatSession()
-    print("New session : ", session_id)
     pnr= await pnr.read()
     pnr_str= pnr.decode("utf-8")
     prompt = pnr_prompt(pnr_str) 
@@ -276,11 +266,8 @@ async def upload_pnr(pnr: UploadFile):
     # paragraph = chain_pnr({"query": question_paragraph_PDF})["result"]
     # return {"paragraph": f"Summary of PNR history :\n{paragraph}"}
     prompt_paragraph_pnr = prompt_summary_pnr(pnr_str)
-    print("Prompt créé")
-    print("prompt :", prompt)
     sessions[session_id].chat_history.clear()
     sessions[session_id].qa_chain_PNR = create_qa_chain(vector_store_null, sessions[session_id].chat_history, prompt)
-    print("Chaine créée")
     chain_paragraph_pnr = chain_paragraph(
         vector_store_null, prompt_paragraph_pnr, nb_chunks=12, search_type="similarity"
     )

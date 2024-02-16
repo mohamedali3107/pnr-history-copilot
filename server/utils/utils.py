@@ -84,11 +84,8 @@ def pdf_to_vector_store(pdf):
         text = "No content"
     else: 
         text = extract_text_from_pdf(pdf)
-    print("TEEEEXT")
     chunks = split_text(text)
-    print("CHUUUUNKS", chunks)
     vector_store = embed_chunks(chunks)
-    print("CECIIIIII EST UN VECTORSTORRRRE: ", vector_store)
     return vector_store
 
 def pnr_to_vector_store(pnr):
