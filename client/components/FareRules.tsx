@@ -94,6 +94,7 @@ export function FareRules({
 
   useEffect(() => {
     fetchFareRules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="flex flex-col w-11/12 mx-auto">
@@ -177,7 +178,7 @@ export function FareRules({
         ))}
       {selectedPnr && !chokbar && (
         <div className="text-sm">
-          <p>Sorry, we couldn't find the fare rules. </p>
+          <p>Sorry, we couldn&apost find the fare rules. </p>
           <p className="mt-2">
             Please make sure you have chosen a PNR History with real flights...
           </p>
